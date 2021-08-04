@@ -1,0 +1,332 @@
+#include <bits/stdc++.h>
+#include <fstream>
+using namespace std;
+
+class Bank{
+private:
+    int acc_no;
+    char name[50];
+    int balance;
+    char type;
+
+public:
+    void create_account();  //To create account
+    void show_account() const;  //To display accounts
+    void modify();  //To make changes in account
+    void deposit(int);  //To deposit money in account
+    void withdraw(int);  //To Withdraw money from account
+    void report();  //To show report of account
+    int get_accno() const;  //To get display account number
+    int get_balance() const;    //To get balance in account
+    char return_type() const;   //To return type of account
+};
+
+void Bank::create_account(){
+    cout<<endl<<"Enter Account Number: ";
+    cin>>acc_no;
+    cout<<endl<<endl<<"Enter the Name of the account Holder: ";
+    cin.ignore();
+    cin.getline(name,50);
+    cout<<endl<<"Enter the type of account you want to create"<<endl<<"s for saving account and c for current account: ";
+    cin>>type;
+    cout<<endl<<"Enter the initial amount to be deposited"<<endl<<"Greate than 500 for saving account and Greater than 1000 for current account: ";
+    cin>>balance;
+    cout<<endl<<"Thank You for creating account. . . Account has been created";
+}
+
+void Bank::show_account() const{
+    cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    cout<<endl<<"Account number: "<<endl;
+    cout<<"Name of Account Holder: "<<name<<endl;
+    cout<<"Type of account: "<<type<<endl;
+    cout<<"Total Balance: "<<balance<<endl;
+
+}
+
+void Bank::modify(){
+    cout<<endl<<"Account number: "<<acc_no;
+    cout<<endl<<"Modify/Update Name of Account Holder: ";
+    cin.ignore();
+    cin.getline(name,50);
+    cout<<endl<<"Change the type of Account: ";
+    cin>>type;
+}
+
+void Bank::deposit(int x){
+    balance=balance+x;
+}
+
+void Bank::withdraw(int x){
+    balance=balance-x;
+}
+
+void Bank::report(){
+    cout<<acc_no<<setw(10)<<" "<<name<<setw(12)<<" "<<type<<setw(10)<<" "<<balance<<endl;
+}
+
+int Bank::get_accno() const{
+    return acc_no;
+}
+
+int Bank::get_balance() const{
+    return balance;
+}
+
+char Bank::return_type() const{
+    return type;
+}
+
+/*Functions for File Handling*/
+
+void write_account();   //To write records in Binary file
+void display_user(int); //To display account details given by user
+void modify_account(int);//To Modify/update account
+void delete_account(int);//To Delete or close account
+void display_all();      //To display all accounts
+void deposit_withdraw(int,int);//To deposit/withdraw from a given account
+
+/*Front Screen Introduction*/
+void f_screen(){
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cout<<"\n\n\n\t\t\t\t Welcome to Bank Of Harshit";
+    cout<<"\n\n\t\t\t\t Bank Management Portal";
+    cout<<"\n\n\t\t\t\t Press Enter key to enter Main Menu...\n\n\n";
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    cin.get();
+}
+
+int main(){
+    	char ch;
+	int num;
+	f_screen();
+	do
+	{
+		system("cls");
+		cout<<"\n\n\n\t\t\t\t\tMAIN MENU";
+		cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+		cout<<"\n\n\t\t\t1.\t Create a New Account ";
+		cout<<"\n\n\t\t\t2.\t Deposit Amount ";
+		cout<<"\n\n\t\t\t3.\t Withdraw Amount ";
+		cout<<"\n\n\t\t\t4.\t Display Balance ";
+		cout<<"\n\n\t\t\t5.\t Show all accounts ";
+		cout<<"\n\n\t\t\t6.\t Close/Delete Account ";
+		cout<<"\n\n\t\t\t7.\t Modify/Update your Account";
+		cout<<"\n\n\t\t\t8.\t ~~~~~~~~~~EXIT~~~~~~~~~";
+		cout<<"\n\n\t\t\tSelect Your Option (1-8) ";
+		cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+		cin>>ch;
+		system("cls");
+		switch(ch)
+		{
+		case '1':
+			write_account();
+			break;
+		case '2':
+            cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+			cout<<"\n\n\tEnter The Account Number : "; cin>>num;
+			deposit_withdraw(num, 1);
+			break;
+		case '3':
+            cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+			cout<<"\n\n\tEnter The Account Number : "; cin>>num;
+			deposit_withdraw(num, 2);
+			break;
+		case '4':
+		    cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+			cout<<"\n\n\tEnter The Account Number : "; cin>>num;
+			display_user(num);
+			break;
+		case '5':
+			display_all();
+			break;
+		case '6':
+            cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+			cout<<"\n\n\tEnter The Account Number : "; cin>>num;
+			delete_account(num);
+			break;
+		 case '7':
+            cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+			cout<<"\n\n\tEnter The account No. : "; cin>>num;
+			modify_account(num);
+			break;
+		 case '8':
+			cout<<"\n\n~~~~~~~~~~~~~~~~~~~~~~~~~Thanks for using bank management portal~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+			break;
+		 default :cout<<"\a";
+		}
+		cin.ignore();
+		cin.get();
+	}while(ch!='8');
+	return 0;
+}
+
+void write_account() //To write in file
+{
+	Bank ac;
+	ofstream outFile;
+	outFile.open("account.dat",ios::binary|ios::app);
+	ac.create_account();
+	outFile.write(reinterpret_cast<char *> (&ac), sizeof(Bank));
+	outFile.close();
+}
+
+void display_user(int n)
+{
+	Bank ac;
+	bool flag=false;
+	ifstream inFile;
+	inFile.open("account.dat",ios::binary);
+	if(!inFile)
+	{
+		cout<<"Sorry...File could not be open !! Press any Key...";
+		return;
+	}
+	cout<<"\nBALANCE DETAILS\n";
+
+    	while(inFile.read(reinterpret_cast<char *> (&ac), sizeof(Bank)))
+	{
+		if(ac.get_accno()==n)
+		{
+			ac.show_account();
+			flag=true;
+		}
+	}
+	inFile.close();
+	if(flag==false)
+		cout<<"\n\nAccount number does not exist";
+}
+
+void modify_account(int n)
+{
+	bool found=false;
+	Bank ac;
+	fstream File;
+	File.open("account.dat",ios::binary|ios::in|ios::out);
+	if(!File)
+	{
+		cout<<"Sorry.... File could not be open !! Press any Key...";
+		return;
+	}
+	while(!File.eof() && found==false)
+	{
+		File.read(reinterpret_cast<char *> (&ac), sizeof(Bank));
+		if(ac.get_accno()==n)
+		{
+			ac.show_account();
+			cout<<"\n\nEnter The New Details of account"<<endl;
+			ac.modify();
+			int pos=(-1)*static_cast<int>(sizeof(Bank));
+			File.seekp(pos,ios::cur);
+			File.write(reinterpret_cast<char *> (&ac), sizeof(Bank));
+			cout<<"\n\n\t Record Updated";
+			found=true;
+		  }
+	}
+	File.close();
+	if(found==false)
+		cout<<"\n\n Record Not Found ";
+}
+
+void delete_account(int n)
+{
+	Bank ac;
+	ifstream inFile;
+	ofstream outFile;
+	inFile.open("account.dat",ios::binary);
+	if(!inFile)
+	{
+		cout<<"File could not be open !! Press any Key...";
+		return;
+	}
+	outFile.open("Temp.dat",ios::binary);
+	inFile.seekg(0,ios::beg);
+	while(inFile.read(reinterpret_cast<char *> (&ac), sizeof(Bank)))
+	{
+		if(ac.get_accno()!=n)
+		{
+			outFile.write(reinterpret_cast<char *> (&ac), sizeof(Bank));
+		}
+	}
+	inFile.close();
+	outFile.close();
+	remove("account.dat");
+	rename("Temp.dat","account.dat");
+	cout<<"\n\n\tRecord Deleted ..";
+}
+
+void display_all()
+{
+	Bank ac;
+	ifstream inFile;
+	inFile.open("account.dat",ios::binary);
+	if(!inFile)
+	{
+		cout<<"Sorry...File could not be open !! Press any Key...";
+		return;
+	}
+	cout<<"\n\n\t\tACCOUNT HOLDER LIST\n\n";
+	cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+	cout<<"A/c no.                NAME           Type     Balance\n";
+	cout<<"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+	while(inFile.read(reinterpret_cast<char *> (&ac), sizeof(Bank)))
+	{
+		ac.report();
+	}
+	inFile.close();
+}
+
+void deposit_withdraw(int n, int option)
+{
+	int amt;
+	bool found=false;
+	Bank ac;
+	fstream File;
+	File.open("account.dat", ios::binary|ios::in|ios::out);
+	if(!File)
+	{
+		cout<<"Sorry...File could not be open !! Press any Key...";
+		return;
+	}
+	while(!File.eof() && found==false)
+	{
+		File.read(reinterpret_cast<char *> (&ac), sizeof(Bank));
+		if(ac.get_accno()==n)
+		{
+			ac.show_account();
+			if(option==1)
+			{
+				cout<<"\n\n\tTO DEPOSIT AMOUNT ";
+				cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+				cout<<"\n\nEnter The amount to be deposited";
+				cin>>amt;
+				ac.deposit(amt);
+			}
+			if(option==2)
+			{
+				cout<<"\n\n\tTO WITHDRAW AMOUNT ";
+				cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+				cout<<"\n\nEnter The amount to be withdraw";
+				cin>>amt;
+				int bal=ac.get_balance()-amt;
+				if((bal<500 && ac.return_type()=='S') || (bal<1000 && ac.return_type()=='C'))
+					cout<<"Insufficience balance";
+				else
+					ac.withdraw(amt);
+			}
+			int pos=(-1)*static_cast<int>(sizeof(ac));
+			File.seekp(pos,ios::cur);
+			File.write(reinterpret_cast<char *> (&ac), sizeof(Bank));
+			cout<<"\n\n\t Record Updated";
+			found=true;
+	       }
+         }
+	File.close();
+	if(found==false)
+		cout<<"\n\n Record Not Found ";
+}
